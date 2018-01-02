@@ -13,26 +13,32 @@ import RxSwift
 
 open class DefaultAPI {
     /**
-     getList
-     
+
+     - parameter action: (query)  
+     - parameter format: (query)  
+     - parameter meta: (query)  
+     - parameter type: (query)  
      - parameter completion: completion handler to receive the data and the error objects
      */
-    open class func getList(completion: @escaping ((_ data: [DeviceEntity]?,_ error: Error?) -> Void)) {
-        getListWithRequestBuilder().execute { (response, error) -> Void in
+    open class func wApiPhpGet(action: String, format: String, meta: String, type: String, completion: @escaping ((_ data: Result?,_ error: Error?) -> Void)) {
+        wApiPhpGetWithRequestBuilder(action: action, format: format, meta: meta, type: type).execute { (response, error) -> Void in
             completion(response?.body, error);
         }
     }
 
     /**
-     getList
-     
-     - returns: Observable<[DeviceEntity]>
+
+     - parameter action: (query)  
+     - parameter format: (query)  
+     - parameter meta: (query)  
+     - parameter type: (query)  
+     - returns: Observable<Result>
      */
-    open class func getList() -> Observable<[DeviceEntity]> {
+    open class func wApiPhpGet(action: String, format: String, meta: String, type: String) -> Observable<Result> {
         return Observable.create { observer -> Disposable in
-            getList() { data, error in
+            wApiPhpGet(action: action, format: format, meta: meta, type: type) { data, error in
                 if let error = error {
-                    observer.on(.error(error as Error))
+                    observer.on(.error(error))
                 } else {
                     observer.on(.next(data!))
                 }
@@ -43,87 +49,39 @@ open class DefaultAPI {
     }
 
     /**
-     getList
-     - GET /exec
-     - examples: [{contentType=application/json, example=[ {
-  "returnDate" : "2000-01-23",
-  "mailAddress" : "aeiou",
-  "userName" : "aeiou",
-  "deviceName" : "aeiou",
-  "deviceId" : "aeiou",
-  "status" : "using"
-} ]}]
+     - GET /w/api.php
+     - examples: [{contentType=application/json, example={
+  "query" : {
+    "tokens" : {
+      "logintoken" : "logintoken"
+    }
+  }
+}}]
+     
+     - parameter action: (query)  
+     - parameter format: (query)  
+     - parameter meta: (query)  
+     - parameter type: (query)  
 
-     - returns: RequestBuilder<[DeviceEntity]> 
+     - returns: RequestBuilder<Result> 
      */
-    open class func getListWithRequestBuilder() -> RequestBuilder<[DeviceEntity]> {
-        let path = "/exec"
+    open class func wApiPhpGetWithRequestBuilder(action: String, format: String, meta: String, type: String) -> RequestBuilder<Result> {
+        let path = "/w/api.php"
         let URLString = SwaggerClientAPI.basePath + path
         let parameters: [String:Any]? = nil
 
         let url = NSURLComponents(string: URLString)
+        url?.queryItems = APIHelper.mapValuesToQueryItems(values:[
+            "action": action, 
+            "format": format, 
+            "meta": meta, 
+            "type": type
+        ])
+        
 
-
-        let requestBuilder: RequestBuilder<[DeviceEntity]>.Type = SwaggerClientAPI.requestBuilderFactory.getBuilder()
+        let requestBuilder: RequestBuilder<Result>.Type = SwaggerClientAPI.requestBuilderFactory.getBuilder()
 
         return requestBuilder.init(method: "GET", URLString: (url?.string ?? URLString), parameters: parameters, isBody: false)
-    }
-
-    /**
-     update
-     
-     - parameter body: (body)  
-     - parameter completion: completion handler to receive the data and the error objects
-     */
-    open class func update(body: DeviceEntity, completion: @escaping ((_ data: MessageEntity?,_ error: Error?) -> Void)) {
-        updateWithRequestBuilder(body: body).execute { (response, error) -> Void in
-            completion(response?.body, error);
-        }
-    }
-
-    /**
-     update
-     
-     - parameter body: (body)  
-     - returns: Observable<MessageEntity>
-     */
-    open class func update(body: DeviceEntity) -> Observable<MessageEntity> {
-        return Observable.create { observer -> Disposable in
-            update(body: body) { data, error in
-                if let error = error {
-                    observer.on(.error(error as Error))
-                } else {
-                    observer.on(.next(data!))
-                }
-                observer.on(.completed)
-            }
-            return Disposables.create()
-        }
-    }
-
-    /**
-     update
-     - POST /exec
-     - update
-     - examples: [{contentType=application/json, example={
-  "message" : "aeiou"
-}}]
-     
-     - parameter body: (body)  
-
-     - returns: RequestBuilder<MessageEntity> 
-     */
-    open class func updateWithRequestBuilder(body: DeviceEntity) -> RequestBuilder<MessageEntity> {
-        let path = "/exec"
-        let URLString = SwaggerClientAPI.basePath + path
-        let parameters = JSONEncodingHelper.encodingParameters(forEncodableObject: body)
-
-        let url = NSURLComponents(string: URLString)
-
-
-        let requestBuilder: RequestBuilder<MessageEntity>.Type = SwaggerClientAPI.requestBuilderFactory.getBuilder()
-
-        return requestBuilder.init(method: "POST", URLString: (url?.string ?? URLString), parameters: parameters, isBody: true)
     }
 
 }

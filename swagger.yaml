@@ -1,64 +1,49 @@
 swagger: '2.0'
 info:
   version: 1.0.0
-  title: 端末管理さんAPI
+  title: MediaWiki API
 schemes:
   - https
 paths:
-  /exec:
-    post:
-      summary: update
-      description: update
-      operationId: update
-      consumes:
-        - application/json
+  /w/api.php:
+    get:
       produces:
         - application/json
       parameters:
-        - in: body
-          name: body
+        - name: action
+          in: query
           required: true
-          schema:
-            $ref: '#/definitions/DeviceEntity'
-      responses:
-        '200':
-          description: result message
-          schema:
-            $ref: '#/definitions/MessageEntity'
-    get:
-      summary: getList
-      operationId: getList
-      produces:
-        - application/json
+          type: string
+        - name: format
+          in: query
+          required: true
+          type: string
+        - name: meta
+          in: query
+          required: true
+          type: string
+        - name: type
+          in: query
+          required: true
+          type: string
       responses:
         '200':
           description: result list
           schema:
-            type: array
-            items:
-              $ref: '#/definitions/DeviceEntity'
+            $ref: '#/definitions/Result'
 definitions:
-  MessageEntity:
+  Result:
     type: object
     properties:
-      message:
-        type: string
-  DeviceEntity:
+      query:
+        $ref: '#/definitions/Query'
+  Query:
     type: object
     properties:
-      userName:
+      tokens:
+        $ref: '#/definitions/Tokens'
+  Tokens:
+    type: object
+    properties:
+      logintoken:
         type: string
-      mailAddress:
-        type: string
-      deviceName:
-        type: string
-      deviceId:
-        type: string
-      returnDate:
-        type: string
-        format: date
-      status:
-        type: string
-        enum:
-          - using
-          - free
